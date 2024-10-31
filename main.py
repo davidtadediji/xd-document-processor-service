@@ -20,6 +20,11 @@ S3_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY_ID")
 S3_SECRET_KEY = os.getenv("AWS_SECRET_ACCESS_KEY") 
 S3_REGION = os.getenv("AWS_REGION") 
 
+# Check if all necessary S3 environment variables are set
+if not all([S3_BUCKET, S3_ACCESS_KEY, S3_SECRET_KEY, S3_REGION]):
+    raise RuntimeError("One or more AWS S3 environment variables are not set.")
+
+
 # Initialize S3 client
 s3_client = boto3.client(
     "s3",
@@ -33,6 +38,9 @@ document_loader = DocumentParser()
 
 # Set up the database connection and table
 DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL environment variable is not set.")
+
 engine, parsed_documents = setup_metadata_store(DATABASE_URL)
 
 @app.post("/api/documents/upload")
