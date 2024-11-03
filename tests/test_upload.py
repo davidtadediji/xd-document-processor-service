@@ -29,3 +29,13 @@ def test_upload_document(
     assert response.status_code == 200
     assert response.json()["message"] == "Document processed and stored successfully!"
     assert response.json()["file_url"] == "https://fake-s3-url.com/parsed_test.txt"
+
+    # Updated assertion to match the actual call signature
+    mock_store_metadata.assert_called_once_with(
+        mock_upload_file["file"][0],  # file
+        "https://fake-s3-url.com/parsed_test.txt",  # file_url
+        {
+            "filename": "test.txt",
+            "num_documents": 1,
+        },  # metadata_details
+    )

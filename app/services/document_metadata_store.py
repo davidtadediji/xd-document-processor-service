@@ -18,6 +18,7 @@ from datetime import datetime, timezone
 
 # Initialize the database engine
 engine = create_engine(settings.DATABASE_URL)
+print(f"Database URL: {settings.DATABASE_URL}")
 metadata = MetaData()
 
 parsed_documents = Table(
@@ -37,14 +38,21 @@ metadata.create_all(engine)
 def store_metadata(file, file_url, metadata):
     try:
         with engine.connect() as connection:
-            insert_stmt = insert(parsed_documents).values(
-                filename=file.filename,
-                content_type=file.content_type,
-                s3_url=file_url,
-                additional_metadata=metadata,
-            )
-            connection.execute(insert_stmt)
-            logger.debug(f"Metadata inserted for file: {file.filename}")
+            transaction = connection.begin()  # Start a transaction
+            try:
+                insert_stmt = insert(parsed_documents).values(
+                    filename=file.filename,
+                    content_type=file.content_type,
+                    s3_url=file_url,
+                    additional_metadata=metadata,
+                )
+                connection.execute(insert_stmt)
+                transaction.commit()  # Commit the transaction
+                logger.debug(f"Metadata inserted for file: {file.filename}")
+            except Exception as e:
+                transaction.rollback()  # Rollback in case of error
+                logger.error(f"Transaction error: {e}")
+                raise
     except SQLAlchemyError as e:
         logger.error(f"Database error: {e}")
         raise HTTPException(

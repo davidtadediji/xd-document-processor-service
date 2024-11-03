@@ -69,7 +69,13 @@ async def upload_document(file: UploadFile = File(...)):
     os.remove(temp_file_path)
     logger.debug(f"Deleted temporary file: {temp_file_path}")
 
-    # Convert parsed metadata to a string or JSON format for storage
+    # Prepare metadata without content
+    metadata_details = {
+        "filename": metadata.get("filename"),
+        "num_documents": metadata.get("num_documents"),
+    }
+
+    # Convert parsed content to a string or JSON format for storage
     parsed_content = str(metadata)  # or json.dumps(metadata) if you prefer JSON
 
     # Store the parsed result in S3
@@ -85,7 +91,7 @@ async def upload_document(file: UploadFile = File(...)):
 
     # Store metadata in the database
     try:
-        store_metadata(file, file_url, metadata)
+        store_metadata(file, file_url, metadata_details)
         logger.info(f"Stored metadata in the database for file: {file.filename}")
     except Exception as e:
         logger.error(f"Metadata storage failed: {e}")
@@ -97,7 +103,7 @@ async def upload_document(file: UploadFile = File(...)):
     return JSONResponse(
         content={
             "message": "Document processed and stored successfully!",
-            "metadata": metadata,
+            "metadata": metadata_details,
             "file_url": file_url,
         }
     )
