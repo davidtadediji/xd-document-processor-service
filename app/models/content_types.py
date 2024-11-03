@@ -4,5 +4,6 @@ SUPPORTED_CONTENT_TYPES = {
     "text/markdown": "Markdown",
     "text/tab-separated-values": "TSV",
     "image/jpeg": "JPEG Image",
-    "image/png": "PNG Image"
+    "image/png": "PNG Image",
+    "application/pdf": "PDF Document"
 } 

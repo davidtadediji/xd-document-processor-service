@@ -4,6 +4,7 @@ from langchain_community.document_loaders import (
     UnstructuredImageLoader,
     UnstructuredMarkdownLoader,
     UnstructuredTSVLoader,
+    PyPDFLoader
 )
 from fastapi import HTTPException
 
@@ -15,33 +16,35 @@ class DocumentParser:
             "text/markdown": UnstructuredMarkdownLoader,
             "text/tab-separated-values": UnstructuredTSVLoader,
             "image/jpeg": UnstructuredImageLoader,
-            "image/png": UnstructuredImageLoader
+            "image/png": UnstructuredImageLoader,
+            "application/pdf": PyPDFLoader
         }
 
-    def load_document(self, content_type, file_url, filename):
+    def load_document(self, content_type, file_path, filename):
         # Select the appropriate loader based on file type
         loader_class = self.loader_mapping.get(content_type)
         if not loader_class:
             raise HTTPException(status_code=400, detail="Unsupported file type for parsing.")
 
-        # Initialize the loader and parse the document
-        loader = loader_class(file_url)
-        documents = loader.load()  # Parse the document
+        try:
+            # Initialize the loader with the file path and parse the document
+            loader = loader_class(file_path)
+            documents = loader.load()  # Parse the document
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error loading {file_path}: {str(e)}")
 
         # Extract metadata or content as needed
         if content_type.startswith("image/"):
-            # Example: For images, you might want to extract dimensions or format
             metadata = {
                 "filename": filename,
                 "content": "Image content not displayed",
                 "format": content_type.split("/")[-1],
             }
         else:
-            # For other document types
             metadata = {
                 "filename": filename,
-                "content": [doc.content for doc in documents],  # Extract content from all documents
+                "content": [doc.page_content for doc in documents],  # Updated attribute
                 "num_documents": len(documents),
             }
 
-        return metadata 
+        return metadata
