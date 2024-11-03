@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
     # AWS S3 Configuration
     S3_BUCKET: str
@@ -16,5 +17,6 @@ class Settings(BaseSettings):
 
     class ConfigDict:
         env_file = ".env"
+
 
 settings = Settings()

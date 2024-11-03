@@ -20,10 +20,12 @@ async def lifespan(app: FastAPI):
     finally:
         logger.info("Shutting down Document Processor Service...")
 
+
 app = FastAPI(
     title="Document Processor Service",
-    lifespan=lifespan  # Define the lifespan context manager
+    lifespan=lifespan,  # Define the lifespan context manager
 )
+
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
@@ -33,7 +35,9 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"detail": "Internal Server Error"},
     )
 
+
 app.include_router(documents.router)
+
 
 # Define a root route
 @app.get("/", response_class=JSONResponse)

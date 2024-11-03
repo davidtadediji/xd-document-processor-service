@@ -21,13 +21,14 @@ uploader = DocumentUploader(
     bucket_name=settings.S3_BUCKET,
     region=settings.S3_REGION,
     access_key=settings.S3_ACCESS_KEY,
-    secret_key=settings.S3_SECRET_KEY
+    secret_key=settings.S3_SECRET_KEY,
 )
 
 
 @router.get("/", response_class=JSONResponse)
 async def welcome():
     return {"detail": "Welcome to Document Processor Service!"}
+
 
 @router.post("/upload", response_class=JSONResponse)
 async def upload_document(file: UploadFile = File(...)):
@@ -39,7 +40,7 @@ async def upload_document(file: UploadFile = File(...)):
         logger.warning(f"Unsupported file type: {file.content_type}")
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid file type. Supported formats: {supported_types}."
+            detail=f"Invalid file type. Supported formats: {supported_types}.",
         )
 
     # Save uploaded file to a temporary file
@@ -54,15 +55,14 @@ async def upload_document(file: UploadFile = File(...)):
         metadata = document_loader.load_document(
             content_type=file.content_type,
             file_path=temp_file_path,
-            filename=file.filename
+            filename=file.filename,
         )
         logger.info(f"Document parsed successfully: {file.filename}")
     except Exception as e:
         os.remove(temp_file_path)
         logger.error(f"Document parsing failed: {e}")
         raise HTTPException(
-            status_code=500,
-            detail=f"Document parsing failed: {str(e)}"
+            status_code=500, detail=f"Document parsing failed: {str(e)}"
         )
 
     # Clean up the temporary file after parsing
@@ -75,7 +75,9 @@ async def upload_document(file: UploadFile = File(...)):
     # Store the parsed result in S3
     try:
         parsed_file_name = f"parsed_{file.filename}.txt"
-        file_url = uploader.upload_file(parsed_content.encode('utf-8'), parsed_file_name)
+        file_url = uploader.upload_file(
+            parsed_content.encode("utf-8"), parsed_file_name
+        )
         logger.info(f"Uploaded parsed file to S3: {file_url}")
     except Exception as e:
         logger.error(f"S3 upload failed: {e}")
@@ -88,13 +90,14 @@ async def upload_document(file: UploadFile = File(...)):
     except Exception as e:
         logger.error(f"Metadata storage failed: {e}")
         raise HTTPException(
-            status_code=500,
-            detail="Could not store metadata in the database."
+            status_code=500, detail="Could not store metadata in the database."
         )
 
     # Return success response
-    return JSONResponse(content={
-        "message": "Document processed and stored successfully!",
-        "metadata": metadata,
-        "file_url": file_url,
-    })
+    return JSONResponse(
+        content={
+            "message": "Document processed and stored successfully!",
+            "metadata": metadata,
+            "file_url": file_url,
+        }
+    )
