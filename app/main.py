@@ -1,6 +1,7 @@
 # main.py
 from dotenv import load_dotenv
 import os
+from contextlib import asynccontextmanager
 
 # Load environment variables from .env file
 load_dotenv()
@@ -10,7 +11,19 @@ from fastapi.responses import JSONResponse
 from app.routers import documents
 from app.utils.logger import logger
 
-app = FastAPI(title="Document Processor Service")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("Starting Document Processor Service...")
+    try:
+        yield
+    finally:
+        logger.info("Shutting down Document Processor Service...")
+
+app = FastAPI(
+    title="Document Processor Service",
+    lifespan=lifespan  # Define the lifespan context manager
+)
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
@@ -19,14 +32,6 @@ async def global_exception_handler(request: Request, exc: Exception):
         status_code=500,
         content={"detail": "Internal Server Error"},
     )
-
-@app.on_event("startup")
-def startup_event():
-    logger.info("Starting Document Processor Service...")
-
-@app.on_event("shutdown")
-def shutdown_event():
-    logger.info("Shutting down Document Processor Service...")
 
 app.include_router(documents.router)
 

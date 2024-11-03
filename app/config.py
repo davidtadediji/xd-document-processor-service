@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     # Application Settings
     LOG_LEVEL: str = "INFO"
 
-    class Config:
+    class ConfigDict:
         env_file = ".env"
 
 settings = Settings()

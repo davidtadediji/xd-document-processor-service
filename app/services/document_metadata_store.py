@@ -1,11 +1,10 @@
 # document_metadata_store.py
 from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData, JSON, TIMESTAMP, insert
-from sqlalchemy.engine import Engine
 from sqlalchemy.exc import SQLAlchemyError
 from app.config import settings
 from app.utils.logger import logger
 from fastapi import HTTPException
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Initialize the database engine
 engine = create_engine(settings.DATABASE_URL)
@@ -16,7 +15,7 @@ parsed_documents = Table(
     Column('id', Integer, primary_key=True),
     Column('filename', String),
     Column('content_type', String),
-    Column('upload_date', TIMESTAMP, default=datetime.utcnow),
+    Column('upload_date', TIMESTAMP, default=datetime.now(timezone.utc)),
     Column('s3_url', String),
     Column('additional_metadata', JSON)
 )
