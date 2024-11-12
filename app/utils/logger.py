@@ -4,7 +4,7 @@ from app.config import settings
 
 
 def setup_logger():
-    logger = logging.getLogger("document_processor_service")
+    logger = logging.getLogger("document_parser_service")
     logger.setLevel(getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO))
 
     handler = logging.StreamHandler(sys.stdout)

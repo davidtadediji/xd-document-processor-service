@@ -1,4 +1,4 @@
-# XD Document Processor Service
+# XD Document Parser Service
 
 A reusable and scalable microservice for processing, parsing, and storing documents. Built with FastAPI, leveraging AWS S3 for storage and PostgreSQL for metadata.
 
@@ -25,8 +25,8 @@ A reusable and scalable microservice for processing, parsing, and storing docume
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/yourusername/xd-document-processor-service.git
-   cd xd-document-processor-service
+   git clone https://github.com/yourusername/xd-document-parser-service.git
+   cd xd-document-parser-service
    ```
 
 2. **Create Environment Variables**

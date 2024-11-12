@@ -14,15 +14,15 @@ from app.utils.logger import logger
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Starting Document Processor Service...")
+    logger.info("Starting Document Parser Service...")
     try:
         yield
     finally:
-        logger.info("Shutting down Document Processor Service...")
+        logger.info("Shutting down Document Parser Service...")
 
 
 app = FastAPI(
-    title="Document Processor Service",
+    title="Document Parser Service",
     lifespan=lifespan,  # Define the lifespan context manager
 )
 
@@ -42,4 +42,4 @@ app.include_router(documents.router)
 # Define a root route
 @app.get("/", response_class=JSONResponse)
 async def root():
-    return {"detail": "Welcome to the Root of the Document Processor Service!"}
+    return {"detail": "Welcome to the Root of the Document Parser Service!"}

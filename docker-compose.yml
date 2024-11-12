@@ -3,7 +3,7 @@ version: '3.8'
 services:
   app:
     build: .
-    container_name: document_processor_service
+    container_name: document_parser_service
     env_file:
       - .env
     ports:

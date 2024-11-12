@@ -27,7 +27,7 @@ uploader = DocumentUploader(
 
 @router.get("/", response_class=JSONResponse)
 async def welcome():
-    return {"detail": "Welcome to Document Processor Service!"}
+    return {"detail": "Welcome to Document Parser Service!"}
 
 
 @router.post("/upload", response_class=JSONResponse)
